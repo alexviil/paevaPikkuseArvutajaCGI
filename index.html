@@ -24,12 +24,15 @@
 
 <h1>Päeva pikkuse arvutaja (esialgne)</h1>
 
+<div id="mapid"></div>
+<br>
+
 <form action="javascript:calculate()">
     <label for="latitude">Laius kraadides (-90;90): </label>
-    <input type="number" step="0.001" min="-90" max="90" id="latitude" value="58.38">
+    <input type="number" step="0.001" min="-90" max="90" id="latitude" value="58.366">
     <br>
     <label for="longitude">Pikkus kraadides (-180;180): </label>
-    <input type="number" step="0.001" min="-180" max="180" id="longitude" value="26.72">
+    <input type="number" step="0.001" min="-180" max="180" id="longitude" value="26.741">
     <br>
     <label for="date">Kuupäev</label>
     <input type="date" id="date">
@@ -39,7 +42,7 @@
 <br>
 
 <p>Tulemus: </p>
-<p id="result">a</p>
+<p id="result"></p>
 
 </body>
 </html>

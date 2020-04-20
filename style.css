@@ -9,3 +9,8 @@ h1 {
 p {
     display: inline-block;
 }
+
+#mapid {
+    height: 25vw;
+    width: 45vw;
+}
