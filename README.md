@@ -48,3 +48,23 @@ kasuks.
 
 Leafletjs-i teegil oli ka väga põhjalik kuid samas lühike dokumentatsioon, mis 
 osutus väga suureks abiks ning aitas kiiresti etapi läbida.
+
+### Etapp 3
+***Ajakulu: 3 tundi***  
+
+Kolmanda etapi raskust oli esialgu raske hinnata, kuna pole varem veebilehel graafidega 
+mänginud. Googeldades avastasin ruttu, et on olemas Chart.js. Tundus töökindel ja mugav 
+ning näited hoomatavad. Teise variante ei uurinud, kuna jäin sellega kiiresti rahule. 
+Natuke oli ka katsetamist ja eksimist - esialgu ei teadnud, et uue graafi joonistamisel
+tuleks vana kustutada. Selle puudusel tegi graaf veidraid asju.  
+
+Natuke rohkem tuli seekord muretseda kasutaja sisendite pärast, seega sai ka sellele 
+rohkem tähelepanu pööratud. Ajakulukaks kujunes koodi ümbertöötlus, et vältida
+duplikaatkoodi (arvutused kaardi juures versus graafi jaoks).  
+
+Otseselt miski siin tohutult suurt raskust ei valmistanud.  
+
+### Etapp 4
+***Ajakulu: x tund(i)***  
+
+todo

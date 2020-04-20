@@ -14,3 +14,11 @@ p {
     height: 25vw;
     width: 45vw;
 }
+
+#chartDiv {
+    width: 45vw;
+}
+
+.errorNotification {
+    color: red;
+}
