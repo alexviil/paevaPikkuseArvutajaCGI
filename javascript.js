@@ -22,6 +22,7 @@ https://stackoverflow.com/questions/11715646/scroll-automatically-to-the-bottom-
 */
 
 // Function to calculate the sunset and sunrise times.
+// Returns either daylength as integer or both UTC and local sunrise, sunset and daylength as strings in an array.
 function calculate(date, latitude, longitude, returnOnlylength) {
     // SunCalc
     let SC = SunCalc.getTimes(date, latitude, longitude);
@@ -32,6 +33,7 @@ function calculate(date, latitude, longitude, returnOnlylength) {
     let SCsunriseLCL = new Date(SCsunriseUTC.toLocaleString("en-US", {timeZone: tzlookup(latitude, longitude)}));
     let SCsunsetLCL = new Date(SCsunsetUTC.toLocaleString("en-US", {timeZone: tzlookup(latitude, longitude)}));
 
+    // Day length string (or integer) checking and preparation
     let dayLength = Math.round((SC.sunset - SC.sunrise) / 36000) / 100;
     if (isNaN(dayLength)) {
         // North-south, Winter-summer (from Northern hemisphere's view)
@@ -94,12 +96,13 @@ let chart;
 
 // Function to show calculation results (graph)
 function calculateFromRange() {
+    // Selectors
     let fromDate = new Date($("#fromDate").val());
     let toDate = new Date($("#toDate").val());
     let latitude = $("#latitude").val();
     let longitude = $("#longitude").val();
 
-
+    // Error handling (clears last error, if there was one)
     let error = $("#rangeNotification");
     error.removeClass("bg-danger");
     error.html("");
@@ -122,6 +125,7 @@ function calculateFromRange() {
         return;
     }
 
+    // Data generation
     let labels = []
     let data = []
     for (; fromDate <= toDate; fromDate.setDate(fromDate.getDate() + 1)) {
@@ -131,10 +135,12 @@ function calculateFromRange() {
         data.push(calculate(fromDate, latitude, longitude, true));
     }
 
+    // Removes old chart, if it's been initialized.
     if (chart) {
         chart.destroy();
     }
 
+    // Chart creation using data from above.
     chart = new Chart($("#chart"), {
         type: 'line',
         data: {
@@ -167,10 +173,12 @@ function calculateFromRange() {
         }
     });
 
+    // Scrolls to the bottom, so the user can see the graph they generated.
     window.scrollBy(0, document.body.scrollHeight);
 }
 
 // Get the hours and minutes.
+// Returns time in the from HH:MM as a string.
 function getTime(date, UTC) {
     let hours, minutes;
 
@@ -189,8 +197,10 @@ function getTime(date, UTC) {
     return (hours < 10 ? "0" : "") + hours.toString() + ":" + (minutes < 10 ? "0" : "") + minutes.toString();
 }
 
-// On document load, sets the date selection to today. Also sets graph date selections to today and 7 days from now.
+// On document load, sets the date selection to today, sets graph date selections to today and 7 days from now.
+// Also
 $(function() {
+    // Lambda function to convert the date into something the input fields accept.
     const dateToString = (function (date) {
         let day = date.getDate();
         let month = date.getMonth() + 1;
@@ -198,6 +208,7 @@ $(function() {
         return year + "-" + (month < 10 ? "0" : "") + month + "-" + day;
     });
 
+    // Dates and selectors
     let d = new Date();
     let todayDate = dateToString(d);
     $('#date').val(todayDate);
@@ -205,6 +216,9 @@ $(function() {
 
     d.setDate(d.getDate() + 7);
     $('#toDate').val(dateToString(d));
+
+    let latitudeField = $("#latitude");
+    let longitudeField = $("#longitude");
 
     // Initialization (includes access token I got from Mapbox by making an account)
     var mymap = L.map('mapid').setView([58.38, 26.72], 6);
@@ -218,10 +232,6 @@ $(function() {
         zoomOffset: -1
     }).addTo(mymap);
 
-
-    let latitudeField = $("#latitude");
-    let longitudeField = $("#longitude");
-
     // Click function
     let marker = L.marker([latitudeField.val(), longitudeField.val()]);
     marker.addTo(mymap);
@@ -233,11 +243,10 @@ $(function() {
         // Wrap the longitude (so that the user can go "out of bounds" without error)
         let latlng = e.latlng.wrap();
 
-        let latitude = Math.round(latlng.lat * 1000.0) / 1000.0;
-        let longitude = Math.round(latlng.lng * 1000.0) / 1000.0;
-
-        latitudeField.val(latitude);
-        longitudeField.val(longitude);
+        // Rounding to keep numbers simple (thousandths should be enough for this application) and
+        // update the input fields
+        latitudeField.val(Math.round(latlng.lat * 1000.0) / 1000.0);
+        longitudeField.val(Math.round(latlng.lng * 1000.0) / 1000.0);
     });
 
     // Listeners for input fields
@@ -245,15 +254,19 @@ $(function() {
         let latitude = latitudeField.val();
         let longitude = longitudeField.val();
 
+        // Wrap the longitude
         let latlng = L.latLng(latitude, longitude).wrap();
 
+        // Update the fields using the wrapped
         latitudeField.val(latlng.lat);
-        longitudeField.val(latlng.lng);
+        longitudeField.val(Math.round(latlng.lng * 1000.0) / 1000.0);
 
+        // Set the marker and move the map to it
         marker.setLatLng(latlng);
         mymap.panTo(latlng);
     });
 
+    // Setting the listeners
     latitudeField.on("change", () => updateMap());
     longitudeField.on("change", () => updateMap());
 });
