@@ -1,12 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ee">
 <head>
     <meta charset="UTF-8">
     <meta name="author" content="Alex Viil">
     <meta name="description" content="Päeva pikkuse arvutaja">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Päeva pikkuse arvutaja</title>
-
-    <!-- I forgot how to use node.js and I have midterm exams and lots of homework. Sorry, not enough time! -->
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
@@ -24,39 +23,79 @@
 </head>
 <body>
 
-<h1>Päeva pikkuse arvutaja (esialgne)</h1>
+<div class="container">
 
-<div id="mapid"></div>
-<br>
+    <div class="jumbotron text-center p-3 my-3 bg-primary text-white">
+        <h1>Päeva pikkuse arvutaja</h1>
+    </div>
 
-<form action="javascript:calculateFromMap()">
-    <label for="latitude">Laius kraadides (-90;90): </label>
-    <input type="number" step="0.001" min="-90" max="90" id="latitude" value="58.366">
+    <div class="bg-info p-1 rounded-lg">
+        <div id="mapid"></div>
+    </div>
+    <br>
 
-    <label for="longitude">Pikkus kraadides (-180;180): </label>
-    <input type="number" step="0.001" min="-180" max="180" id="longitude" value="26.741">
+    <div class="row">
+        <div class="col rounded">
+            <p>Päikese-<p>
+            <p>tõus:</p>
+            <p>loojang:</p>
+        </div>
+        <div class="col rounded text-center">
+            <p>UTC</p>
+            <p id="UTCsr"> </p>
+            <p id="UTCss"></p>
+        </div>
+        <div class="col rounded text-center">
+            <p>Kohalik</p>
+            <p id="LCLsr"></p>
+            <p id="LCLss"></p>
+        </div>
+        <div class="col rounded text-center">
+            <p>Pikkus</p>
+            <p id="dayLength"></p>
+        </div>
+        <div id="mapForm" class="col-md-auto rounded">
+            <form action="javascript:calculateFromMap()" class="m-2">
+                <input type="number" step="0.001" min="-90" max="90" id="latitude" value="58.366">
+                <label for="latitude">Laius kraadides (-90;90)</label>
+                <br>
+                <input type="number" step="0.001" min="-180" max="180" id="longitude" value="26.741">
+                <label for="longitude">Pikkus kraadides (-180;180)</label>
+                <br>
+                <input type="date" id="date">
+                <label for="date">Kuupäev</label>
+                <br>
+                <button>Arvuta</button>
+                <small class="errorNotification rounded-lg m-1 text-white" id="mapNotification"></small>
+            </form>
+        </div>
+    </div>
 
-    <label for="date">Kuupäev</label>
-    <input type="date" id="date">
+    <div id="chartDiv">
+        <canvas id="chart"></canvas>
+    </div>
 
-    <button>Arvuta</button>
-</form>
+    <form class="row rounded py-3" action="javascript:calculateFromRange()">
+        <div class="col mx-1">
+            <label class="col" for="fromDate">Kuupäev alates:</label>
+            <input class="col" type="date" id ="fromDate">
+        </div>
+        <div class="col mx-1">
+            <label class="col" for="toDate">Kuupäev kuni:</label>
+            <input class="col" type="date" id ="toDate">
+        </div>
+        <br>
+        <div class="col mx-1 align-items-center">
+            <small class="col errorNotification rounded-lg text-white" id="rangeNotification"></small>
+            <button class="col mr-1">Arvuta</button>
+        </div>
+    </form>
 
-<p>Tulemus: </p>
-<p id="result"></p>
+    <div class="jumbotron text-center p-3 my-3 bg-secondary text-white">
+        <span><strong>Alex Viil 2020</strong></span>
+    </div>
 
-<div id="chartDiv">
-    <canvas id="chart">a</canvas>
 </div>
-
-<form action="javascript:calculateFromRange()">
-    <label for="fromDate">Kuupäev alates: </label>
-    <input type="date" id ="fromDate">
-    <label for="toDate">Kuupäev kuni: </label>
-    <input type="date" id ="toDate">
-    <button>Arvuta</button>
-    <p class="errorNotification" id="rangeNotification"></p>
-</form>
 
 </body>
 </html>

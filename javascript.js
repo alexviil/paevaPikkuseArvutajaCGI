@@ -56,7 +56,7 @@ function calculate(date, latitude, longitude, returnOnlylength) {
     let ssUTC = getTime(SCsunsetUTC, true);
     let ssLCL = getTime(SCsunsetLCL, false);
 
-    return [srUTC, srLCL, ssUTC, ssLCL, dayLength]
+    return [srUTC, srLCL, ssUTC, ssLCL, dayLength];
 }
 
 // Function to show calculation results (map)
@@ -67,19 +67,26 @@ function calculateFromMap() {
     let latitude = $("#latitude").val();
     let longitude = $("#longitude").val();
 
+    // Checking for error or clearing error field (just in case the last calculation failed)
+    let error = $("#mapNotification");
+    if (date.toString() === "Invalid Date") {
+        error.addClass("bg-danger");
+        error.html("Kuupäev ei tohi tühi olla.");
+        return
+    } else {
+        error.removeClass("bg-danger");
+        error.html("");
+    }
+
     // Calculating result
     let calculationResult = calculate(date, latitude, longitude, false);
-    let srUTC = calculationResult[0];
-    let srLCL = calculationResult[1];
-    let ssUTC = calculationResult[2];
-    let ssLCL = calculationResult[3];
-    let dayLength = calculationResult[4];
 
     // Changing what the user sees to match.
-    $("#result").html("Päikesetõus (UTC): <strong>" + srUTC + "</strong>, Päikeseloojang (UTC): <strong>"
-        + ssUTC + "</strong> Päikesetõus (kohalik): <strong>" + srLCL + "</strong>, Päikeseloojang (kohalik): <strong>"
-        + ssLCL + "</strong>, Päeva pikkus: <strong>" + dayLength + "</strong>");
-
+    $("#UTCsr").html("<strong>" + calculationResult[0] + "</strong>");
+    $("#UTCss").html("<strong>" + calculationResult[2] + "</strong>");
+    $("#LCLsr").html("<strong>" + calculationResult[1] + "</strong>");
+    $("#LCLss").html("<strong>" + calculationResult[3] + "</strong>");
+    $("#dayLength").html("<strong>" + calculationResult[4] + "</strong>");
 }
 
 // Chart initialization
@@ -92,22 +99,25 @@ function calculateFromRange() {
     let latitude = $("#latitude").val();
     let longitude = $("#longitude").val();
 
-    console.log(fromDate);
-    console.log(toDate);
 
     let error = $("#rangeNotification");
+    error.removeClass("bg-danger");
     error.html("");
 
     if (toDate <= fromDate) {
+        error.addClass("bg-danger");
         error.html("Esimene kuupäev peab teisest väiksem olema.");
         return;
     } if (fromDate.toString() === 'Invalid Date' && toDate.toString() === "Invalid Date") {
+        error.addClass("bg-danger");
         error.html("Esimene ja teine kuupäev ei tohi tühjad olla.");
         return;
     } if (fromDate.toString() === 'Invalid Date') {
+        error.addClass("bg-danger");
         error.html("Esimene kuupäev ei tohi tühi olla.");
         return;
     } if (toDate.toString() === "Invalid Date") {
+        error.addClass("bg-danger");
         error.html("Teine kuupäev ei tohi tühi olla.");
         return;
     }
@@ -115,7 +125,9 @@ function calculateFromRange() {
     let labels = []
     let data = []
     for (; fromDate <= toDate; fromDate.setDate(fromDate.getDate() + 1)) {
-        labels.push(fromDate.getDate() + "." + (fromDate.getMonth() + 1));
+        let month = fromDate.getMonth() + 1;
+        month = month < 10 ? "0" + month.toString() : month.toString();
+        labels.push(fromDate.getDate() + "." + month);
         data.push(calculate(fromDate, latitude, longitude, true));
     }
 
@@ -134,9 +146,25 @@ function calculateFromRange() {
                 fill: false
             }
             ]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    // Decided not to alter the scales, so the user can better compare results at their selected values
+                    //display: true, ticks: {min: 0.0, max: 24.0}
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Päeva pikkus tundides, h'
+                    }
+                }],
+                xAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Kuupäev, dd.MM'
+                    }
+                }]
+            }
         }
-        // Decided not to alter the scales, so the user can better compare results at their selected values
-        //options: {scales: {yAxes: [{display: true, ticks: {min: 0.0, max: 24.0}}]}}
     });
 
     window.scrollBy(0, document.body.scrollHeight);
@@ -161,7 +189,7 @@ function getTime(date, UTC) {
     return (hours < 10 ? "0" : "") + hours.toString() + ":" + (minutes < 10 ? "0" : "") + minutes.toString();
 }
 
-// On document load, sets the date selection to today. Also sets graph date selection to today and 7 days from now.
+// On document load, sets the date selection to today. Also sets graph date selections to today and 7 days from now.
 $(function() {
     const dateToString = (function (date) {
         let day = date.getDate();
@@ -182,7 +210,6 @@ $(function() {
     var mymap = L.map('mapid').setView([58.38, 26.72], 6);
     L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYWxleHZpaWwiLCJhIjoiY2s5NXg2anpmMGFmMDNrbDRpemlmbnpyNCJ9.mlus4jEkWhmwMLV0zDVMxw', {
         maxZoom: 14,
-        minZoom: 2,
         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
             '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
             'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -191,7 +218,6 @@ $(function() {
         zoomOffset: -1
     }).addTo(mymap);
 
-    mymap.setMaxBounds([[-90, -180], [90, 180]]);
 
     let latitudeField = $("#latitude");
     let longitudeField = $("#longitude");
@@ -201,9 +227,14 @@ $(function() {
     marker.addTo(mymap);
 
     mymap.on('click', function(e) {
+        // Set the marker down
         marker.setLatLng(e.latlng);
-        let latitude = Math.round(e.latlng.lat * 1000.0) / 1000.0;
-        let longitude = Math.round(e.latlng.lng * 1000.0) / 1000.0;
+
+        // Wrap the longitude (so that the user can go "out of bounds" without error)
+        let latlng = e.latlng.wrap();
+
+        let latitude = Math.round(latlng.lat * 1000.0) / 1000.0;
+        let longitude = Math.round(latlng.lng * 1000.0) / 1000.0;
 
         latitudeField.val(latitude);
         longitudeField.val(longitude);
@@ -214,10 +245,13 @@ $(function() {
         let latitude = latitudeField.val();
         let longitude = longitudeField.val();
 
-        if (latitude < 90 && latitude > -90 && longitude < 180 && longitude > -180) {
-            marker.setLatLng([latitude, longitude]);
-            mymap.panTo([latitude, longitude]);
-        }
+        let latlng = L.latLng(latitude, longitude).wrap();
+
+        latitudeField.val(latlng.lat);
+        longitudeField.val(latlng.lng);
+
+        marker.setLatLng(latlng);
+        mymap.panTo(latlng);
     });
 
     latitudeField.on("change", () => updateMap());

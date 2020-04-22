@@ -1,24 +1,35 @@
 body {
-    padding: 1vw;
+    background-color: azure;
 }
 
-h1 {
-    padding-bottom: 2vw;
+input, button {
+    max-height: 36px;
 }
 
-p {
-    display: inline-block;
+div.col {
+    background-color: rgba(165, 222, 255, 0.6);
+    margin-right: 0.5vw;
+    padding: 0.5vw;
+}
+
+#mapForm {
+    background-color: rgba(121, 195, 229, 0.6);
+    padding: 0.5vw 10vw 0.5vw 0.5vw;
+}
+
+div.container > form {
+    background-color: rgba(121, 195, 229, 0.6);
 }
 
 #mapid {
-    height: 25vw;
-    width: 45vw;
+    height: 60vh;
 }
 
 #chartDiv {
-    width: 45vw;
+    margin-bottom: 2vw;
 }
 
 .errorNotification {
-    color: red;
+    color: white;
+    display: inline-block;
 }
